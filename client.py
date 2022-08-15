@@ -27,12 +27,12 @@ INITIATE_PACKET = UNIQUE_ID + TRANSACTION_ID + FLAG + \
 Message = INITIATE_PACKET.encode()
 
 clientSock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+clientSock.bind(('', 6703))
+
 clientSock.sendto(Message, (UDP_IP_ADDRESS, UDP_PORT_NO))
 
 
 # WAIT FOR SERVER RESPONSE
-clientSock.connect(('10.0.15.255', 6703))
-
 while True:
     data, addr = clientSock.recvfrom(1024)
     if len(data) > 0:
