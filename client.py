@@ -75,7 +75,7 @@ CHQ = int(CHQ)
 i = 1
 while True:
     if CHQ % sympy.prime(i) == 0:
-        j = CHQ / i
+        j = CHQ / sympy.prime(i)
         break
     i += 1
     print(sympy.prime(i), end="\t")
