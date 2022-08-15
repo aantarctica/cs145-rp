@@ -31,7 +31,7 @@ clientSock.sendto(Message, (UDP_IP_ADDRESS, UDP_PORT_NO))
 
 
 # WAIT FOR SERVER RESPONSE
-clientSock.bind(('10.0.15.255', 6703))
+clientSock.connect(('10.0.15.255', 6703))
 
 while True:
     data, addr = clientSock.recvfrom(1024)
