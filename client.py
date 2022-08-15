@@ -32,7 +32,7 @@ clientSock.bind(('', 6703))
 clientSock.sendto(Message, (UDP_IP_ADDRESS, UDP_PORT_NO))
 
 
-# WAIT FOR SERVER RESPONSE 1
+# WAIT FOR SERVER: ACCEPT
 while True:
     data, addr = clientSock.recvfrom(1024)
     if len(data) > 0:
@@ -56,9 +56,15 @@ Message = PULL_PACKET.encode()
 clientSock.sendto(Message, (UDP_IP_ADDRESS, UDP_PORT_NO))
 
 
-# WAIT FOR SERVER RESPONSE 1
+# WAIT FOR SERVER: DATA
 while True:
     data, addr = clientSock.recvfrom(1024)
     if len(data) > 0:
-        print(data.decode())
+        SERVER_DATA = data.decode()
+        print(SERVER_DATA)
+
         break
+
+UIN = SERVER_DATA[14:21]
+CHQ, ENCDATA = SERVER_DATA[24:].split("DATA")
+print(f"UIN: {UIN}\n CHQ: {CHQ}\n DATA: {ENCDATA}")
