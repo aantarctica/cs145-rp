@@ -1,4 +1,5 @@
 import socket
+import sympy
 
 # SSH to your AWS instance
 # ssh -i "keypair.pem" ubuntu@54.255.247.86
@@ -71,13 +72,13 @@ UIN = SERVER_DATA[14:21]
 CHQ, ENCDATA = SERVER_DATA[24:].split("DATA")
 CHQ = int(CHQ)
 
-i = 2
+i = 1
 while True:
-    if CHQ % i == 0:
+    if CHQ % sympy.prime(i) == 0:
         j = CHQ / i
         break
     i += 1
-    print(i, end="\t")
+    print(sympy.prime(i), end="\t")
 
 shift = i % 26
 
