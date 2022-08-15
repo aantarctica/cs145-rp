@@ -1,7 +1,7 @@
 import socket
 
 # SSH to your AWS instance
-# ssh -i "keypair.pem" ubuntu@13.214.210.195
+# ssh -i "keypair.pem" ubuntu@54.255.247.86
 
 UDP_IP_ADDRESS = "10.0.5.69"
 UDP_PORT_NO = 9000
@@ -64,6 +64,20 @@ while True:
         print(SERVER_DATA)
         break
 
+
+# PARSE SERVER DATA
+
 UIN = SERVER_DATA[14:21]
 CHQ, ENCDATA = SERVER_DATA[24:].split("DATA")
-print(f"UIN: {UIN}\n CHQ: {CHQ}\n DATA: {ENCDATA}")
+CHQ = int(CHQ)
+
+i = 2
+while True:
+    if CHQ % i == 0:
+        j = CHQ / i
+        break
+    i += 1
+
+shift = i % 26
+
+print(f"UIN: {UIN}\nCHQ: {CHQ}\nDATA: {ENCDATA}\nshift: {shift}")
