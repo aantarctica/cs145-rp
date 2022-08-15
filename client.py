@@ -71,13 +71,14 @@ UIN = SERVER_DATA[14:21]
 CHQ, ENCDATA = SERVER_DATA[24:].split("DATA")
 CHQ = int(CHQ)
 
-# i = 2
-# while True:
-#     if CHQ % i == 0:
-#         j = CHQ / i
-#         break
-#     i += 1
+i = 2
+while True:
+    if CHQ % i == 0:
+        j = CHQ / i
+        break
+    i += 1
+    print(i, end="\t")
 
-# shift = i % 26
+shift = i % 26
 
 print(f"UIN: {UIN}\nCHQ: {CHQ}\nDATA: {ENCDATA}\n")
