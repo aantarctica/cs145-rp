@@ -32,7 +32,31 @@ clientSock.bind(('', 6703))
 clientSock.sendto(Message, (UDP_IP_ADDRESS, UDP_PORT_NO))
 
 
-# WAIT FOR SERVER RESPONSE
+# WAIT FOR SERVER RESPONSE 1
+while True:
+    data, addr = clientSock.recvfrom(1024)
+    if len(data) > 0:
+        print(data.decode())
+        TRANSACTION_ID = str(data.decode())
+        break
+
+# PULL PACKET
+FLAG = "4"
+PULL_BYTE = "00000"
+PULL_SIZE = "00002"
+UIN = "TTTTTTT"
+UIN_ANS = "0"
+DATA = "0"
+
+
+PULL_PACKET = UNIQUE_ID + TRANSACTION_ID + FLAG + \
+    PULL_BYTE + PULL_SIZE + UIN + UIN_ANS + "/" + DATA
+Message = PULL_PACKET.encode()
+
+clientSock.sendto(Message, (UDP_IP_ADDRESS, UDP_PORT_NO))
+
+
+# WAIT FOR SERVER RESPONSE 1
 while True:
     data, addr = clientSock.recvfrom(1024)
     if len(data) > 0:
