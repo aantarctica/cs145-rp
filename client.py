@@ -62,7 +62,6 @@ while True:
     if len(data) > 0:
         SERVER_DATA = data.decode()
         print(SERVER_DATA)
-
         break
 
 UIN = SERVER_DATA[14:21]
