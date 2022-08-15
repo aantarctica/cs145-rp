@@ -4,7 +4,7 @@ import socket
 # ssh -i "keypair.pem" ubuntu@13.214.210.195
 
 UDP_IP_ADDRESS = "10.0.5.69"
-UDP_PORT_NO = 6703
+UDP_PORT_NO = 9000
 
 UNIQUE_ID = "d5f5c97c"
 
