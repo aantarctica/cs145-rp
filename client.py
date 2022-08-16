@@ -112,6 +112,7 @@ class sender:
             self.receiveData()
             self.sendPacket("ACK")
             self.sendPacket("SUBMIT")
+            time.sleep(10)
 
 
 SENDER = sender()
