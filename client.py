@@ -1,4 +1,5 @@
 import socket
+import time
 # SSH to your AWS instance
 # ssh -i "keypair.pem" ubuntu@54.255.247.86
 
@@ -108,6 +109,7 @@ class sender:
             self.receiveAccept()
             self.sendPacket("PULL")
             self.receiveData()
+            time.sleep(120)
 
 
 SENDER = sender()
