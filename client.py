@@ -105,6 +105,7 @@ class sender:
 
     def beginTransaction(self):
         for i in range(5):
+            print("New transaction")
             self.PACKET = packet()
             self.sendPacket("INITIATE")
             self.receiveAccept()
