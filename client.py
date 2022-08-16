@@ -67,9 +67,9 @@ class sender:
 
             print("Sending PULL Packet")
         elif type == "ACK":
-            pass
+            PACKET.setFlag("2")
         elif type == "SUBMIT":
-            pass
+            PACKET.setFlag("1")
         else:
             print("ERROR: Packet type not specified.")
 
@@ -96,6 +96,7 @@ class sender:
 
         UIN = SERVER_DATA[14:21]
         PACKET.setUIN(UIN)
+        PACKET.setUINAns("123456789")
 
         CHQ, ENCDATA = SERVER_DATA[24:].split("DATA")
         CHQ = int(CHQ)
@@ -109,7 +110,8 @@ class sender:
             self.receiveAccept()
             self.sendPacket("PULL")
             self.receiveData()
-            time.sleep(120)
+            self.sendPacket("ACK")
+            self.sendPacket("SUBMIT")
 
 
 SENDER = sender()
