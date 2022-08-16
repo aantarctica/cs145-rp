@@ -104,13 +104,15 @@ class sender:
         print(f"UIN: {UIN}\nCHQ: {CHQ}\nDATA: {ENCDATA}\n")
 
     def beginTransaction(self):
-        self.PACKET = packet()
-        self.sendPacket("INITIATE")
-        self.receiveAccept()
-        self.sendPacket("PULL")
-        self.receiveData()
-        self.sendPacket("ACK")
-        self.sendPacket("SUBMIT")
+        for i in range(5):
+            self.PACKET = packet()
+            self.sendPacket("INITIATE")
+            self.receiveAccept()
+            self.sendPacket("PULL")
+            self.receiveData()
+            self.sendPacket("ACK")
+            time.sleep(5)
+            self.sendPacket("SUBMIT")
 
 
 SENDER = sender()
