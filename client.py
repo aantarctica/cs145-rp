@@ -53,7 +53,7 @@ class sender:
         elif type == "PULL":
             PACKET.setFlag("4")
             PACKET.setPullByte("00000")
-            PACKET.setPullSize("00002")
+            PACKET.setPullSize("00004")
             print("Sending PULL Packet")
         elif type == "ACK":
             pass
