@@ -43,7 +43,13 @@ class sender:
         self.clientSock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.clientSock.bind(('', 6703))
 
-        self.PACKET = packet()
+        self.PULL_SIZE = 1
+
+    def getPullSize(self):
+        base = str(self.PULL_SIZE)
+        zeroes = 5 - len(base)
+
+        return "0" * zeroes + base
 
     def sendPacket(self, type):
         PACKET = self.PACKET
@@ -53,7 +59,11 @@ class sender:
         elif type == "PULL":
             PACKET.setFlag("4")
             PACKET.setPullByte("00000")
-            PACKET.setPullSize("00004")
+
+            PULL_SIZE = self.getPullSize()
+            PACKET.setPullSize(PULL_SIZE)
+            self.PULL_SIZE *= 2
+
             print("Sending PULL Packet")
         elif type == "ACK":
             pass
@@ -92,10 +102,12 @@ class sender:
         print(f"UIN: {UIN}\nCHQ: {CHQ}\nDATA: {ENCDATA}\n")
 
     def beginTransaction(self):
-        self.sendPacket("INITIATE")
-        self.receiveAccept()
-        self.sendPacket("PULL")
-        self.receiveData()
+        for i in range(10):
+            self.PACKET = packet()
+            self.sendPacket("INITIATE")
+            self.receiveAccept()
+            self.sendPacket("PULL")
+            self.receiveData()
 
 
 SENDER = sender()
