@@ -201,6 +201,8 @@ class sender:
 
         PACKET.SHIFT = FACTORS[0] % 26
 
+        PACKET.setData(ENCDATA)
+
         print(
             f"TRANSACTION_ID: {PACKET.TRANSACTION_ID}\nUIN: {PACKET.UIN}\nCHQ: {CHQ}\nENCDATA: {ENCDATA}\nUIN_ANS: {PACKET.UIN_ANS}\nSHIFT: {PACKET.SHIFT}\n")
 
