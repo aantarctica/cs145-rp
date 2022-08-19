@@ -134,14 +134,7 @@ class sender:
             print("ERROR: Packet type not specified.")
 
         # SEND PAYLOAD
-        self.PAYLOAD = f"{PACKET.UNIQUE_ID}\
-                        {PACKET.TRANSACTION_ID}\
-                        {PACKET.FLAG}\
-                        {PACKET.PULL_BYTE}\
-                        {PACKET.PULL_SIZE}\
-                        {PACKET.UIN}\
-                        {PACKET.UIN_ANS}/\
-                        {PACKET.DATA}"
+        self.PAYLOAD = f"{PACKET.UNIQUE_ID}{PACKET.TRANSACTION_ID}{PACKET.FLAG}{PACKET.PULL_BYTE}{PACKET.PULL_SIZE}{PACKET.UIN}{PACKET.UIN_ANS}/{PACKET.DATA}"
 
         print(f"{type}:\t{self.PAYLOAD}")
 
