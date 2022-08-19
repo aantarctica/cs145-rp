@@ -101,6 +101,7 @@ class sender:
 
         if time.time() - self.TRANSACTION_START_TIME > 110:
             type = "ACK&SUBMIT"
+            PACKET.DONE = True
 
         if type == "INITIATE":
             pass
