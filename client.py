@@ -109,9 +109,14 @@ class sender:
         PACKET = self.PACKET
         data, _ = self.clientSock.recvfrom(1024)
 
-        print(data.decode())
+        SERVER_RESPONSE = data.decode()
+        if SERVER_RESPONSE == "Existing alive transaction":
+            print("ERROR: Existing alive transaction")
+            exit(-1)
 
-        TRANSACTION_ID = data.decode()
+        print(SERVER_RESPONSE)
+
+        TRANSACTION_ID = SERVER_RESPONSE
         PACKET.setTransID(TRANSACTION_ID)
 
     def modular_pow(self, base, exponent, modulus):
@@ -191,10 +196,6 @@ class sender:
         data, _ = self.clientSock.recvfrom(1024)
 
         SERVER_DATA = data.decode()
-
-        if SERVER_DATA == "Existing alive transaction":
-            print("ERROR: Existing alive transaction")
-            exit(-1)
 
         print(SERVER_DATA)
         UIN = SERVER_DATA[14:21]
