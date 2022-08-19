@@ -1,8 +1,8 @@
-from operator import le
 import socket
 import math
 import random
 import time
+import select
 
 # SSH to your AWS instance
 # ssh -i "keypair.pem" ubuntu@54.255.247.86
@@ -17,10 +17,9 @@ class packet:
         self.PULL_SIZE = "WWWWW"
         self.UIN = "TTTTTTT"
         self.UIN_ANS = "0"
-        self.DATA = "0"
+        self.DATA = ""
         self.SHIFT = 0
         self.DONE = False
-        self.PULL_START_TIME = 0
 
     def setTransID(self, TRANSACTION_ID):
         self.TRANSACTION_ID = TRANSACTION_ID
@@ -40,8 +39,8 @@ class packet:
     def setUINAns(self, UIN_ANS):
         self.UIN_ANS = UIN_ANS
 
-    def setData(self, DATA):
-        self.DATA = DATA
+    def appendData(self, DATA):
+        self.DATA += DATA
 
     def decodeData(self):
         ENCRYPTED = self.DATA
@@ -69,50 +68,68 @@ class sender:
         self.clientSock.bind(('', 6703))
 
         self.PULL_SIZE = 1
+        self.PULL_BYTE = 0
         self.PULL_START_TIME = 0
 
-    def getPullSize(self):
-        base = str(self.PULL_SIZE)
-        zeroes = 5 - len(base)
+    def getPullValues(self, PACKET):
+        PSIZE_STR = str(self.PULL_SIZE)
+        PBYTE_STR = str(self.PULL_BYTE)
 
-        return "0" * zeroes + base
+        zeroes = 5 - len(PSIZE_STR)
+        PACKET.PULL_SIZE = "0" * zeroes + PSIZE_STR
+
+        zeroes = 5 - len(PBYTE_STR)
+        PACKET.PULL_BYTE = "0" * zeroes + PBYTE_STR
+
+    def handleNextPull(self):
+        self.PULL_SIZE += 1
+        self.PULL_BYTE += 1
 
     def sendPacket(self, type):
         PACKET = self.PACKET
 
         if type == "INITIATE":
             pass
+
         elif type == "PULL":
             PACKET.setFlag("4")
-            PACKET.setPullByte("00000")
-
-            PULL_SIZE = self.getPullSize()
-            PACKET.setPullSize(PULL_SIZE)
+            self.getPullValues(PACKET)
 
             print("Sending PULL Packet...")
             self.PULL_START_TIME = time.time()
 
         elif type == "ACK":
+            PACKET.setFlag("2")\
 
-            self.PULL_SIZE += 1
-
-            PACKET.setFlag("2")
+            self.handleNextPull()
 
         elif type == "SUBMIT":
             PACKET.setFlag("1")
+
             print("Decoding data...")
             PACKET.decodeData()
 
         elif type == "ACK&SUBMIT":
             PACKET.setFlag("3")
+
             print("Decoding data...")
             PACKET.decodeData()
 
         else:
             print("ERROR: Packet type not specified.")
 
-        self.PAYLOAD = f"{PACKET.UNIQUE_ID}{PACKET.TRANSACTION_ID}{PACKET.FLAG}{PACKET.PULL_BYTE}{PACKET.PULL_SIZE}{PACKET.UIN}{PACKET.UIN_ANS}/{PACKET.DATA}"
-        print(f"{type}: {self.PAYLOAD}")
+        # SEND PAYLOAD
+        self.PAYLOAD = f"{PACKET.UNIQUE_ID}\
+                        {PACKET.TRANSACTION_ID}\
+                        {PACKET.FLAG}\
+                        {PACKET.PULL_BYTE}\
+                        {PACKET.PULL_SIZE}\
+                        {PACKET.UIN}\
+                        {PACKET.UIN_ANS}/\
+                        {PACKET.DATA}"
+
+        print(f"{type}:\t{self.PAYLOAD}")
+
         self.clientSock.sendto(self.PAYLOAD.encode(),
                                (self.UDP_IP_ADDRESS, self.UDP_PORT_NO))
 
@@ -204,33 +221,13 @@ class sender:
 
         return sorted([factor, large_number / factor])
 
-    def receiveData(self):
-        PACKET = self.PACKET
-
-        PACKET.PULL_START_TIME = time.time()
-        data = ""
-
-        while True:
-            data, _ = self.clientSock.recvfrom(1024)
-
-            if len(data) > 0:
-                break
-            if time.time() - PACKET.PULL_START_TIME > 10:
-                PACKET.PULL_START_TIME = 0
-                print("ERROR: Pull Window Exceeded!")
-                self.PULL_SIZE -= 1
-                self.sendPacket("PULL")
-
-        SERVER_DATA = data.decode()
-
-        print(SERVER_DATA)
+    def parseData(self, PACKET, SERVER_DATA):
         UIN = SERVER_DATA[14:21]
         PACKET.setUIN(UIN)
 
         CHQ, ENCDATA = SERVER_DATA[24:].split("DATA")
-        CHQ = int(CHQ)
 
-        FACTORS = self.getUINAns(CHQ)
+        FACTORS = self.getUINAns(int(CHQ))
 
         UIN_ANS = int(FACTORS[1])
         PACKET.setUINAns(UIN_ANS)
@@ -241,10 +238,28 @@ class sender:
             PACKET.DONE = True
             ENCDATA.pop()
 
-        PACKET.setData(ENCDATA)
+        PACKET.appendData(ENCDATA)
 
         print(
-            f"TRANSACTION_ID: {PACKET.TRANSACTION_ID}\nUIN: {PACKET.UIN}\nCHQ: {CHQ}\nENCDATA: {ENCDATA}\nUIN_ANS: {PACKET.UIN_ANS}\nSHIFT: {PACKET.SHIFT}")
+            f"TRANSACTION_ID: {PACKET.TRANSACTION_ID}\n\
+            UIN: {PACKET.UIN}\nCHQ: {CHQ}\nENCDATA: {ENCDATA}\n\
+            UIN_ANS: {PACKET.UIN_ANS}\nSHIFT: {PACKET.SHIFT}")
+
+    def receiveData(self):
+        PACKET = self.PACKET
+
+        PACKET.PULL_START_TIME = time.time()
+        self.clientSock.setblocking(0)
+
+        ready = select.select([self.clientSock], [], [], 10)
+
+        if ready[0]:
+            data, _ = self.clientSock.recvfrom(1024)
+        else:
+            print("ERROR: Pull Window Exceeded!")
+            #  Call function handling PULL_BYTE and PULL_SIZE
+
+        self.parseData(PACKET, data.decode())
 
     def receiveAck(self):
         data, _ = self.clientSock.recvfrom(1024)
