@@ -155,7 +155,6 @@ class sender:
 
         # we will pick from the range [2, N)
         x = random.randint(random.randint(0, 2), n - 2) + 2
-        print(f"POLLARD-RHO\tx: {x}")
         y = x
 
         # the constant in f(x).
@@ -189,7 +188,6 @@ class sender:
             if (d == n):
                 return self.PollardRho(n, iterations)
 
-        print(f"iterations = {iterations}")
         return d
 
     def getUINAns(self, large_number):
@@ -220,9 +218,11 @@ class sender:
 
         PACKET.SHIFT = int(FACTORS[0] % 26)
 
-        PACKET.setData(ENCDATA)
-        if ENCDATA[-1] == None:
+        if ENCDATA[-1] == "<":
             PACKET.DONE = True
+            ENCDATA.pop()
+
+        PACKET.setData(ENCDATA)
 
         print(
             f"TRANSACTION_ID: {PACKET.TRANSACTION_ID}\nUIN: {PACKET.UIN}\nCHQ: {CHQ}\nENCDATA: {ENCDATA}\nUIN_ANS: {PACKET.UIN_ANS}\nSHIFT: {PACKET.SHIFT}")
