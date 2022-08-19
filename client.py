@@ -132,13 +132,11 @@ class sender:
             PACKET.setFlag("1")
 
             print("Submitting data...")
-            PACKET.decodeData()
 
         elif type == "ACK&SUBMIT":
             PACKET.setFlag("3")
 
             print("Sending ACK and submitting data...")
-            PACKET.decodeData()
 
         else:
             print("ERROR: Packet type not specified.")
