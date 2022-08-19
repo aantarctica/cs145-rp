@@ -175,13 +175,13 @@ class sender:
 
         FACTORS = self.getUINAns(CHQ)
 
-        UIN_ANS = FACTORS[1]
+        UIN_ANS = int(FACTORS[1])
         PACKET.setUINAns(UIN_ANS)
 
         PACKET.SHIFT = FACTORS[0] % 26
 
         print(
-            f"UIN: {PACKET.UIN}\nCHQ: {CHQ}\nENCDATA: {ENCDATA}\nUIN_ANS: {PACKET.UIN_ANS}\nSHIFT: {PACKET.SHIFT}\n")
+            f"TRANSACTION_ID: {PACKET.TRANSACTION_ID}\nUIN: {PACKET.UIN}\nCHQ: {CHQ}\nENCDATA: {ENCDATA}\nUIN_ANS: {PACKET.UIN_ANS}\nSHIFT: {PACKET.SHIFT}\n")
 
     def beginTransaction(self):
         print("New transaction")
