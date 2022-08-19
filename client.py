@@ -59,7 +59,7 @@ class packet:
                 DECRYPTED += chr((ord(char) - base_small -
                                  self.SHIFT) % 26 + base_small)
 
-        print(f"ENCRYPTED: {ENCRYPTED}\tDECRYPTED: {DECRYPTED}")
+        print(f"\t\tENCRYPTED: {ENCRYPTED}\n\t\tDECRYPTED: {DECRYPTED}")
         self.DATA = DECRYPTED
 
     def setDone(self):
@@ -255,6 +255,7 @@ class sender:
         PACKET.setShift(int(FACTORS[0] % 26))
 
         if "<END>" in ENCDATA:
+            print(F"ENCRYPTED:\t{ENCDATA}\n********END OF DATA!********")
             PACKET.setDone()
             ENCDATA, _ = ENCDATA.split("<END>")
 
