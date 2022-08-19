@@ -96,6 +96,7 @@ class sender:
             print("ERROR: Packet type not specified.")
 
         self.PAYLOAD = f"{PACKET.UNIQUE_ID}{PACKET.TRANSACTION_ID}{PACKET.FLAG}{PACKET.PULL_BYTE}{PACKET.PULL_SIZE}{PACKET.UIN}{PACKET.UIN_ANS}/{PACKET.DATA}"
+        print(f"{type}: {self.PAYLOAD}")
         self.clientSock.sendto(self.PAYLOAD.encode(),
                                (self.UDP_IP_ADDRESS, self.UDP_PORT_NO))
 
