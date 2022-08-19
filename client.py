@@ -64,7 +64,7 @@ class sender:
         self.clientSock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.clientSock.bind(('', 6703))
 
-        self.PULL_SIZE = 5
+        self.PULL_SIZE = 10
 
     def getPullSize(self):
         base = str(self.PULL_SIZE)
