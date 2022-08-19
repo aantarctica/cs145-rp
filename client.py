@@ -170,6 +170,7 @@ class sender:
         while (d == 1):
             iterations += 1
             if time.time() - self.PULL_START_TIME > 10:
+                self.PULL_START_TIME = time.time()
                 self.getUINAns(n)
 
             # Tortoise Move: x(i+1) = f(x(i))
