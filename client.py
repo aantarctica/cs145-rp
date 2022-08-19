@@ -86,8 +86,9 @@ class sender:
 
     def handleNextPull(self):
         if self.WINDOW_EXCEEDED:
-            self.PULL_SIZE -= 1
-            self.MAX_PULL_SIZE = self.PULL_SIZE
+            self.MAX_PULL_SIZE = self.PULL_SIZE - 1
+            self.PULL_SIZE //= 2
+            self.WINDOW_EXCEEDED = False
 
         elif self.PULL_SIZE < self.MAX_PULL_SIZE - 1:
             self.PULL_BYTE += self.PULL_SIZE
@@ -265,7 +266,8 @@ class sender:
                 self.handleNextPull()
                 self.sendPacket("PULL")
             else:
-                self.sendPacket("ACK&SUBMIT")
+                PACKET.DONE = True
+                return
 
     def receiveAck(self):
         data, _ = self.clientSock.recvfrom(1024)
