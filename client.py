@@ -144,9 +144,6 @@ class sender:
         return result
 
     def PollardRho(self, n, i):
-        if time.time() - self.PULL_START_TIME > 10:
-            self.getUINAns(n)
-
         iterations = i
         # no prime divisor for 1
         if (n == 1):
@@ -172,6 +169,8 @@ class sender:
         # If n is prime, return n
         while (d == 1):
             iterations += 1
+            if time.time() - self.PULL_START_TIME > 10:
+                self.getUINAns(n)
 
             # Tortoise Move: x(i+1) = f(x(i))
             x = (self.modular_pow(x, 2, n) + c + n) % n
