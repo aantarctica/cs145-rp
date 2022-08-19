@@ -257,7 +257,7 @@ class sender:
         if "<END>" in ENCDATA:
             print(F"ENCRYPTED:\t{ENCDATA}\n********END OF DATA!********")
             PACKET.setDone()
-            ENCDATA, _ = ENCDATA.split("<END>")
+            # ENCDATA, _ = ENCDATA.split("<END>")
 
         PACKET.appendData(ENCDATA)
 
