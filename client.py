@@ -39,6 +39,9 @@ class packet:
     def setUINAns(self, UIN_ANS):
         self.UIN_ANS = UIN_ANS
 
+    def setShift(self, SHIFT):
+        self.SHIFT = SHIFT
+
     def appendData(self, DATA):
         self.DATA += DATA
 
@@ -59,6 +62,9 @@ class packet:
         print(f"ENCRYPTED: {ENCRYPTED}\tDECRYPTED: {DECRYPTED}")
         self.DATA = DECRYPTED
 
+    def setDone(self):
+        self.DONE = True
+
 
 class sender:
     def __init__(self):
@@ -74,15 +80,17 @@ class sender:
         self.TRANSACTION_START_TIME = time.time()
         self.PULL_START_TIME = 0
 
-    def getPullValues(self, PACKET):
+    def getPullValues(self):
+        PACKET = self.PACKET
+
         PSIZE_STR = str(self.PULL_SIZE)
         PBYTE_STR = str(self.PULL_BYTE)
 
         zeroes = 5 - len(PSIZE_STR)
-        PACKET.PULL_SIZE = "0" * zeroes + PSIZE_STR
+        PACKET.setPullSize("0" * zeroes + PSIZE_STR)
 
         zeroes = 5 - len(PBYTE_STR)
-        PACKET.PULL_BYTE = "0" * zeroes + PBYTE_STR
+        PACKET.setPullByte("0" * zeroes + PBYTE_STR)
 
     def handleNextPull(self):
         if self.WINDOW_EXCEEDED:
@@ -101,7 +109,7 @@ class sender:
         PACKET = self.PACKET
 
         if time.time() - self.TRANSACTION_START_TIME > 110:
-            PACKET.DONE = True
+            PACKET.setDone()
             return
 
         if type == "INITIATE":
@@ -109,7 +117,7 @@ class sender:
 
         elif type == "PULL":
             PACKET.setFlag("4")
-            self.getPullValues(PACKET)
+            self.getPullValues()
 
             print("Sending PULL Packet...")
             self.PULL_START_TIME = time.time()
@@ -231,7 +239,9 @@ class sender:
 
         return sorted([factor, large_number / factor])
 
-    def parseData(self, PACKET, SERVER_DATA):
+    def parseData(self, SERVER_DATA):
+        PACKET = self.PACKET
+
         UIN = SERVER_DATA[14:21]
         PACKET.setUIN(UIN)
 
@@ -242,7 +252,11 @@ class sender:
         UIN_ANS = int(FACTORS[1])
         PACKET.setUINAns(UIN_ANS)
 
-        PACKET.SHIFT = int(FACTORS[0] % 26)
+        PACKET.setShift(int(FACTORS[0] % 26))
+
+        if "<END>" in ENCDATA:
+            PACKET.setDone()
+            ENCDATA.pop("<END>")
 
         PACKET.appendData(ENCDATA)
 
@@ -257,7 +271,7 @@ class sender:
 
         if ready[0]:
             data, _ = self.clientSock.recvfrom(1024)
-            self.parseData(PACKET, data.decode())
+            self.parseData(data.decode())
         else:
             print("ERROR: Pull Window Exceeded!")
             self.WINDOW_EXCEEDED = True
@@ -266,7 +280,7 @@ class sender:
                 self.handleNextPull()
                 self.sendPacket("PULL")
             else:
-                PACKET.DONE = True
+                PACKET.setDone()
                 return
 
     def receiveAck(self):
@@ -278,19 +292,15 @@ class sender:
         self.PACKET = packet()
         self.sendPacket("INITIATE")
         self.receiveAccept()
-        while True:
+        while not self.PACKET.DONE:
             self.sendPacket("PULL")
             self.receiveData()
             self.sendPacket("ACK")
             # self.receiveAck()
-
-            if self.PACKET.DONE:
-                self.sendPacket("SUBMIT")
-                self.receiveAck()
-                break
-
-            time.sleep(0.5)
             print("-----------------\n")
+        self.sendPacket("SUBMIT")
+        self.receiveAck()
+        print(f"[TXN{self.PACKET.TRANSACTION_ID}] DONE!\n")
 
 
 SENDER = sender()
