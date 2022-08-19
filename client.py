@@ -39,6 +39,23 @@ class packet:
     def setData(self, DATA):
         self.DATA = DATA
 
+    def decodeData(self):
+        ENCRYPTED = self.DATA
+        DECRYPTED = ""
+        base_capital = ord('A')
+        base_small = ord('a')
+
+        for char in ENCRYPTED:
+            if char.isupper():
+                DECRYPTED += chr((ord(char) - base_capital -
+                                 self.SHIFT) % 26 + base_capital)
+            else:
+                DECRYPTED += chr((ord(char) - base_small -
+                                 self.SHIFT) % 26 + base_small)
+
+        print(f"ENCRYPTED: {ENCRYPTED}\tDECRYPTED: {DECRYPTED}")
+        self.DATA = DECRYPTED
+
 
 class sender:
     def __init__(self):
@@ -73,6 +90,8 @@ class sender:
             PACKET.setFlag("2")
         elif type == "SUBMIT":
             PACKET.setFlag("1")
+            print("Decoding data...")
+            PACKET.decodeData()
         else:
             print("ERROR: Packet type not specified.")
 
@@ -134,7 +153,6 @@ class sender:
         # If n is prime, return n
         while (d == 1):
             iterations += 1
-            print(f"iterations = {iterations}")
 
             # Tortoise Move: x(i+1) = f(x(i))
             x = (self.modular_pow(x, 2, n) + c + n) % n
@@ -151,9 +169,12 @@ class sender:
             if (d == n):
                 return self.PollardRho(n, iterations)
 
+        print(f"iterations = {iterations}")
         return d
 
     def getUINAns(self, large_number):
+
+        print("Calculating factors...")
 
         factor = self.PollardRho(large_number, 0)
 
