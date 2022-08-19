@@ -18,7 +18,6 @@ class packet:
         self.UIN_ANS = "0"
         self.DATA = "0"
         self.SHIFT = 0
-        self.SOLVED_CHQ = False
         self.DONE = False
 
     def setTransID(self, TRANSACTION_ID):
@@ -207,20 +206,17 @@ class sender:
         CHQ, ENCDATA = SERVER_DATA[24:].split("DATA")
         CHQ = int(CHQ)
 
-        if not PACKET.SOLVED_CHQ:
+        FACTORS = self.getUINAns(CHQ)
 
-            FACTORS = self.getUINAns(CHQ)
+        UIN_ANS = int(FACTORS[1])
+        PACKET.setUINAns(UIN_ANS)
 
-            UIN_ANS = int(FACTORS[1])
-            PACKET.setUINAns(UIN_ANS)
-
-            PACKET.SHIFT = int(FACTORS[0] % 26)
-
-            PACKET.SOLVED_CHQ = True
+        PACKET.SHIFT = int(FACTORS[0] % 26)
 
         PACKET.setData(ENCDATA)
         if ENCDATA[-1] == None:
             PACKET.DONE = True
+
         print(
             f"TRANSACTION_ID: {PACKET.TRANSACTION_ID}\nUIN: {PACKET.UIN}\nCHQ: {CHQ}\nENCDATA: {ENCDATA}\nUIN_ANS: {PACKET.UIN_ANS}\nSHIFT: {PACKET.SHIFT}")
 
