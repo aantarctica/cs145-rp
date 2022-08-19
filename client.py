@@ -69,6 +69,9 @@ class sender:
 
         self.PULL_SIZE = 1
         self.PULL_BYTE = 0
+        self.MAX_PULL_SIZE = 1000
+        self.WINDOW_EXCEEDED = False
+        self.TRANSACTION_START_TIME = time.time()
         self.PULL_START_TIME = 0
 
     def getPullValues(self, PACKET):
@@ -82,11 +85,22 @@ class sender:
         PACKET.PULL_BYTE = "0" * zeroes + PBYTE_STR
 
     def handleNextPull(self):
-        self.PULL_SIZE += 1
-        self.PULL_BYTE += 1
+        if self.WINDOW_EXCEEDED:
+            self.PULL_SIZE -= 1
+            self.MAX_PULL_SIZE = self.PULL_SIZE
+
+        elif self.PULL_SIZE < self.MAX_PULL_SIZE - 1:
+            self.PULL_BYTE += self.PULL_SIZE
+            self.PULL_SIZE += 1
+
+        else:
+            self.PULL_BYTE += self.PULL_SIZE
 
     def sendPacket(self, type):
         PACKET = self.PACKET
+
+        if time.time() - self.TRANSACTION_START_TIME > 110:
+            type = "ACK&SUBMIT"
 
         if type == "INITIATE":
             pass
@@ -102,17 +116,18 @@ class sender:
             PACKET.setFlag("2")\
 
             self.handleNextPull()
+            print("Sending ACK...")
 
         elif type == "SUBMIT":
             PACKET.setFlag("1")
 
-            print("Decoding data...")
+            print("Submitting data...")
             PACKET.decodeData()
 
         elif type == "ACK&SUBMIT":
             PACKET.setFlag("3")
 
-            print("Decoding data...")
+            print("Sending ACK and submitting data...")
             PACKET.decodeData()
 
         else:
@@ -234,36 +249,35 @@ class sender:
 
         PACKET.SHIFT = int(FACTORS[0] % 26)
 
-        if ENCDATA[-1] == "<":
-            PACKET.DONE = True
-            ENCDATA.pop()
-
         PACKET.appendData(ENCDATA)
 
         print(
-            f"TRANSACTION_ID: {PACKET.TRANSACTION_ID}\n\
-            UIN: {PACKET.UIN}\nCHQ: {CHQ}\nENCDATA: {ENCDATA}\n\
-            UIN_ANS: {PACKET.UIN_ANS}\nSHIFT: {PACKET.SHIFT}")
+            f"TRANSACTION_ID:\t{PACKET.TRANSACTION_ID}\n\
+            UIN:\t{PACKET.UIN}\nCHQ:\t{CHQ}\nENCDATA:\t{ENCDATA}\n\
+            UIN_ANS:\t{PACKET.UIN_ANS}\nSHIFT:\t{PACKET.SHIFT}")
 
     def receiveData(self):
         PACKET = self.PACKET
 
-        PACKET.PULL_START_TIME = time.time()
         self.clientSock.setblocking(0)
-
         ready = select.select([self.clientSock], [], [], 10)
 
         if ready[0]:
             data, _ = self.clientSock.recvfrom(1024)
+            self.parseData(PACKET, data.decode())
         else:
             print("ERROR: Pull Window Exceeded!")
-            #  Call function handling PULL_BYTE and PULL_SIZE
+            self.WINDOW_EXCEEDED = True
 
-        self.parseData(PACKET, data.decode())
+            if time.time() - self.TRANSACTION_START_TIME < 100:
+                self.handleNextPull()
+                self.sendPacket("PULL")
+            else:
+                self.sendPacket("ACK&SUBMIT")
 
     def receiveAck(self):
         data, _ = self.clientSock.recvfrom(1024)
-        print(f"Ack received: {data.decode()}")
+        print(f"Ack received:\t{data.decode()}")
 
     def beginTransaction(self):
         print("New transaction")
@@ -281,7 +295,7 @@ class sender:
                 self.receiveAck()
                 break
 
-            time.sleep(1)
+            time.sleep(0.5)
             print("-----------------\n")
 
 
