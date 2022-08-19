@@ -237,7 +237,7 @@ class sender:
             self.sendPacket("PULL")
             self.receiveData()
             self.sendPacket("ACK")
-            self.receiveAck()
+            # self.receiveAck()
 
             if self.PACKET.DONE:
                 self.sendPacket("SUBMIT")
