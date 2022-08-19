@@ -93,13 +93,16 @@ class sender:
             self.PULL_START_TIME = time.time()
 
         elif type == "ACK":
+
             self.PULL_SIZE += 1
+
             PACKET.setFlag("2")
 
         elif type == "SUBMIT":
             PACKET.setFlag("1")
             print("Decoding data...")
             PACKET.decodeData()
+
         elif type == "ACK&SUBMIT":
             PACKET.setFlag("3")
             print("Decoding data...")
@@ -214,6 +217,8 @@ class sender:
                 break
             if time.time() - PACKET.PULL_START_TIME > 10:
                 PACKET.PULL_START_TIME = 0
+                print("ERROR: Pull Window Exceeded!")
+                self.PULL_SIZE -= 1
                 self.sendPacket("PULL")
 
         SERVER_DATA = data.decode()
