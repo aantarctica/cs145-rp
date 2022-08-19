@@ -1,6 +1,7 @@
 import socket
 import math
 import random
+import time
 
 # SSH to your AWS instance
 # ssh -i "keypair.pem" ubuntu@54.255.247.86
@@ -231,6 +232,7 @@ class sender:
             self.receiveData()
             self.sendPacket("ACK&SUBMIT")
             self.receiveAck()
+            time.sleep(3)
             print("-----------------\n")
 
 
