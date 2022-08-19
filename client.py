@@ -67,6 +67,7 @@ class sender:
         self.clientSock.bind(('', 6703))
 
         self.PULL_SIZE = 1
+        self.PULL_START_TIME = 0
 
     def getPullSize(self):
         base = str(self.PULL_SIZE)
@@ -88,6 +89,8 @@ class sender:
             self.PULL_SIZE += 1
 
             print("Sending PULL Packet...")
+            self.PULL_START_TIME = time.time()
+
         elif type == "ACK":
             PACKET.setFlag("2")
         elif type == "SUBMIT":
@@ -141,6 +144,9 @@ class sender:
         return result
 
     def PollardRho(self, n, i):
+        if time.time() - self.PULL_START_TIME > 10:
+            self.getUINAns(n)
+
         iterations = i
         # no prime divisor for 1
         if (n == 1):
