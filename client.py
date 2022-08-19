@@ -276,7 +276,7 @@ class sender:
             print("ERROR: Pull Window Exceeded!")
             self.WINDOW_EXCEEDED = True
 
-            if time.time() - self.TRANSACTION_START_TIME < 100:
+            if time.time() - self.TRANSACTION_START_TIME < 110:
                 self.handleNextPull()
                 self.sendPacket("PULL")
             else:
