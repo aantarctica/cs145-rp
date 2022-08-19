@@ -1,3 +1,4 @@
+from operator import le
 import socket
 import math
 import random
@@ -19,6 +20,7 @@ class packet:
         self.DATA = "0"
         self.SHIFT = 0
         self.DONE = False
+        self.PULL_START_TIME = 0
 
     def setTransID(self, TRANSACTION_ID):
         self.TRANSACTION_ID = TRANSACTION_ID
@@ -86,13 +88,14 @@ class sender:
 
             PULL_SIZE = self.getPullSize()
             PACKET.setPullSize(PULL_SIZE)
-            self.PULL_SIZE += 1
 
             print("Sending PULL Packet...")
             self.PULL_START_TIME = time.time()
 
         elif type == "ACK":
+            self.PULL_SIZE += 1
             PACKET.setFlag("2")
+
         elif type == "SUBMIT":
             PACKET.setFlag("1")
             print("Decoding data...")
@@ -200,7 +203,18 @@ class sender:
 
     def receiveData(self):
         PACKET = self.PACKET
-        data, _ = self.clientSock.recvfrom(1024)
+
+        PACKET.PULL_START_TIME = time.time()
+        data = ""
+
+        while True:
+            data, _ = self.clientSock.recvfrom(1024)
+
+            if len(data) > 0:
+                break
+            if time.time() - PACKET.PULL_START_TIME > 10:
+                PACKET.PULL_START_TIME = 0
+                self.sendPacket("PULL")
 
         SERVER_DATA = data.decode()
 
