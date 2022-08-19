@@ -161,7 +161,7 @@ class sender:
         # the constant in f(x).
         # Algorithm can be re-run with a different c
         # if it throws failure for a composite.
-        c = (random.randint(0, 1) % (n - 1))
+        c = random.randint(random.randint(0, 1), n - 1) + 1
 
         # Initialize candidate divisor (or result)
         d = 1
