@@ -64,7 +64,7 @@ class sender:
         self.clientSock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.clientSock.bind(('', 6703))
 
-        self.PULL_SIZE = 10
+        self.PULL_SIZE = 1
 
     def getPullSize(self):
         base = str(self.PULL_SIZE)
@@ -213,7 +213,7 @@ class sender:
         PACKET.setData(ENCDATA)
 
         print(
-            f"TRANSACTION_ID: {PACKET.TRANSACTION_ID}\nUIN: {PACKET.UIN}\nCHQ: {CHQ}\nENCDATA: {ENCDATA}\nUIN_ANS: {PACKET.UIN_ANS}\nSHIFT: {PACKET.SHIFT}\n")
+            f"TRANSACTION_ID: {PACKET.TRANSACTION_ID}\nUIN: {PACKET.UIN}\nCHQ: {CHQ}\nENCDATA: {ENCDATA}\nUIN_ANS: {PACKET.UIN_ANS}\nSHIFT: {PACKET.SHIFT}")
 
     def receiveAck(self):
         data, _ = self.clientSock.recvfrom(1024)
@@ -230,6 +230,7 @@ class sender:
             self.receiveData()
             self.sendPacket("ACK&SUBMIT")
             self.receiveAck()
+            print("-----------------\n")
 
 
 SENDER = sender()
