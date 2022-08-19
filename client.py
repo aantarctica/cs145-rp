@@ -100,8 +100,8 @@ class sender:
         PACKET = self.PACKET
 
         if time.time() - self.TRANSACTION_START_TIME > 110:
-            type = "ACK&SUBMIT"
             PACKET.DONE = True
+            return
 
         if type == "INITIATE":
             pass
@@ -246,9 +246,7 @@ class sender:
         PACKET.appendData(ENCDATA)
 
         print(
-            f"TRANSACTION_ID:\t{PACKET.TRANSACTION_ID}\n\
-            UIN:\t{PACKET.UIN}\nCHQ:\t{CHQ}\nENCDATA:\t{ENCDATA}\n\
-            UIN_ANS:\t{PACKET.UIN_ANS}\nSHIFT:\t{PACKET.SHIFT}")
+            f"TRANSACTION_ID:\t{PACKET.TRANSACTION_ID}\nUIN:\t{PACKET.UIN}\nCHQ:\t{CHQ}\nENCDATA:\t{ENCDATA}\nUIN_ANS:\t{PACKET.UIN_ANS}\nSHIFT:\t{PACKET.SHIFT}")
 
     def receiveData(self):
         PACKET = self.PACKET
