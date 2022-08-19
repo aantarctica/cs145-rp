@@ -256,7 +256,7 @@ class sender:
 
         if "<END>" in ENCDATA:
             PACKET.setDone()
-            ENCDATA.pop("<END>")
+            ENCDATA, _ = ENCDATA.split("<END>")
 
         PACKET.appendData(ENCDATA)
 
