@@ -209,7 +209,7 @@ class sender:
         UIN_ANS = int(FACTORS[1])
         PACKET.setUINAns(UIN_ANS)
 
-        PACKET.SHIFT = FACTORS[0] % 26
+        PACKET.SHIFT = int(FACTORS[0] % 26)
 
         PACKET.setData(ENCDATA)
 
