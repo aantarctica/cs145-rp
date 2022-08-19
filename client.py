@@ -222,17 +222,17 @@ class sender:
         print(f"Ack received: {data.decode()}")
 
     def beginTransaction(self):
+        print("New transaction")
+        self.PACKET = packet()
+        self.sendPacket("INITIATE")
+        self.receiveAccept()
 
         for i in range(5):
-            print("New transaction")
-            self.PACKET = packet()
-            self.sendPacket("INITIATE")
-            self.receiveAccept()
             self.sendPacket("PULL")
             self.receiveData()
             self.sendPacket("ACK&SUBMIT")
             self.receiveAck()
-            time.sleep(3)
+            time.sleep(2)
             print("-----------------\n")
 
 
