@@ -45,8 +45,8 @@ class packet:
     def appendData(self, DATA):
         self.DATA += DATA
 
-    def decodeData(self):
-        ENCRYPTED = self.DATA
+    def decodeData(self, TEMP_DATA):
+        ENCRYPTED = TEMP_DATA
         DECRYPTED = ""
         base_capital = ord('A')
         base_small = ord('a')
@@ -60,7 +60,7 @@ class packet:
                                  self.SHIFT) % 26 + base_small)
 
         print(f"\t\tENCRYPTED: {ENCRYPTED}\n\t\tDECRYPTED: {DECRYPTED}")
-        self.DATA = DECRYPTED
+        self.DATA += DECRYPTED
 
     def setDone(self):
         self.DONE = True
@@ -257,9 +257,9 @@ class sender:
         if "<END>" in ENCDATA:
             print(F"ENCRYPTED:\t{ENCDATA}\n********END OF DATA!********")
             PACKET.setDone()
-            # ENCDATA, _ = ENCDATA.split("<END>")
+            ENCDATA, _ = ENCDATA.split("<END>")
 
-        PACKET.appendData(ENCDATA)
+        PACKET.decodeData(ENCDATA)
 
         print(
             f"TRANSACTION_ID:\t{PACKET.TRANSACTION_ID}\nUIN:\t{PACKET.UIN}\nCHQ:\t{CHQ}\nENCDATA:\t{ENCDATA}\nUIN_ANS:\t{PACKET.UIN_ANS}\nSHIFT:\t{PACKET.SHIFT}")
