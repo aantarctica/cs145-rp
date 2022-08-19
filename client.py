@@ -207,15 +207,17 @@ class sender:
             f"TRANSACTION_ID: {PACKET.TRANSACTION_ID}\nUIN: {PACKET.UIN}\nCHQ: {CHQ}\nENCDATA: {ENCDATA}\nUIN_ANS: {PACKET.UIN_ANS}\nSHIFT: {PACKET.SHIFT}\n")
 
     def beginTransaction(self):
-        print("New transaction")
-        self.PACKET = packet()
-        self.sendPacket("INITIATE")
-        self.receiveAccept()
-        self.sendPacket("PULL")
-        self.receiveData()
-        self.sendPacket("ACK")
 
-        self.sendPacket("SUBMIT")
+        for i in range(5):
+            print("New transaction")
+            self.PACKET = packet()
+            self.sendPacket("INITIATE")
+            self.receiveAccept()
+            self.sendPacket("PULL")
+            self.receiveData()
+            self.sendPacket("ACK")
+
+            self.sendPacket("SUBMIT")
 
 
 SENDER = sender()
