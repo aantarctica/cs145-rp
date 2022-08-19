@@ -212,6 +212,10 @@ class sender:
         print(
             f"TRANSACTION_ID: {PACKET.TRANSACTION_ID}\nUIN: {PACKET.UIN}\nCHQ: {CHQ}\nENCDATA: {ENCDATA}\nUIN_ANS: {PACKET.UIN_ANS}\nSHIFT: {PACKET.SHIFT}\n")
 
+    def receiveAck(self):
+        data, _ = self.clientSock.recvfrom(1024)
+        print(f"Ack received: {data.decode()}")
+
     def beginTransaction(self):
 
         for i in range(5):
@@ -222,6 +226,7 @@ class sender:
             self.sendPacket("PULL")
             self.receiveData()
             self.sendPacket("ACK&SUBMIT")
+            self.receiveAck()
 
 
 SENDER = sender()
