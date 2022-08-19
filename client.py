@@ -130,6 +130,7 @@ class sender:
 
         elif type == "SUBMIT":
             PACKET.setFlag("1")
+            PACKET.appendData("<END>")
 
             print("Submitting data...")
 
