@@ -189,6 +189,7 @@ class sender:
                 return self.PollardRho(n, iterations)
 
         print(f"iterations = {iterations}")
+        self.PULL_START_TIME = time.time()
         return d
 
     def getUINAns(self, large_number):
