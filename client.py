@@ -154,7 +154,7 @@ class sender:
             return 2
 
         # we will pick from the range [2, N)
-        x = (random.randint(0, 2) % (n - 2))
+        x = random.randint(random.randint(0, 2), n - 2) + 2
         print(f"POLLARD-RHO\tx: {x}")
         y = x
 
