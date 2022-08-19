@@ -92,6 +92,11 @@ class sender:
             PACKET.setFlag("1")
             print("Decoding data...")
             PACKET.decodeData()
+        elif type == "ACK&SUBMIT":
+            PACKET.setFlag("3")
+            print("Decoding data...")
+            PACKET.decodeData()
+
         else:
             print("ERROR: Packet type not specified.")
 
@@ -216,9 +221,7 @@ class sender:
             self.receiveAccept()
             self.sendPacket("PULL")
             self.receiveData()
-            self.sendPacket("ACK")
-
-            self.sendPacket("SUBMIT")
+            self.sendPacket("ACK&SUBMIT")
 
 
 SENDER = sender()
