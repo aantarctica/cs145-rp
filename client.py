@@ -1,9 +1,7 @@
 import socket
-import time
 import math
 import random
 
-from .chq import PollardRho
 # SSH to your AWS instance
 # ssh -i "keypair.pem" ubuntu@54.255.247.86
 
