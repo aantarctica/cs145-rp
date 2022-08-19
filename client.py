@@ -134,7 +134,7 @@ class sender:
         # If n is prime, return n
         while (d == 1):
             iterations += 1
-            print(f"iterations = {i}")
+            print(f"iterations = {iterations}")
 
             # Tortoise Move: x(i+1) = f(x(i))
             x = (self.modular_pow(x, 2, n) + c + n) % n
