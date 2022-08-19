@@ -88,7 +88,7 @@ class sender:
             PACKET.setPullSize(PULL_SIZE)
             self.PULL_SIZE += 1
 
-            print("Sending PULL Packet")
+            print("Sending PULL Packet...")
         elif type == "ACK":
             PACKET.setFlag("2")
         elif type == "SUBMIT":
