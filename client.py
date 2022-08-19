@@ -230,7 +230,7 @@ class sender:
         for i in range(5):
             self.sendPacket("PULL")
             self.receiveData()
-            self.sendPacket("ACK")
+            self.sendPacket("ACK&SUBMIT")
             self.receiveAck()
             time.sleep(2)
             print("-----------------\n")
