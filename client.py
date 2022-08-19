@@ -18,6 +18,8 @@ class packet:
         self.UIN_ANS = "0"
         self.DATA = "0"
         self.SHIFT = 0
+        self.SOLVED_CHQ = False
+        self.DONE = False
 
     def setTransID(self, TRANSACTION_ID):
         self.TRANSACTION_ID = TRANSACTION_ID
@@ -84,7 +86,7 @@ class sender:
 
             PULL_SIZE = self.getPullSize()
             PACKET.setPullSize(PULL_SIZE)
-            self.PULL_SIZE *= 2
+            self.PULL_SIZE += 1
 
             print("Sending PULL Packet")
         elif type == "ACK":
@@ -205,15 +207,20 @@ class sender:
         CHQ, ENCDATA = SERVER_DATA[24:].split("DATA")
         CHQ = int(CHQ)
 
-        FACTORS = self.getUINAns(CHQ)
+        if not PACKET.SOLVED_CHQ:
 
-        UIN_ANS = int(FACTORS[1])
-        PACKET.setUINAns(UIN_ANS)
+            FACTORS = self.getUINAns(CHQ)
 
-        PACKET.SHIFT = int(FACTORS[0] % 26)
+            UIN_ANS = int(FACTORS[1])
+            PACKET.setUINAns(UIN_ANS)
+
+            PACKET.SHIFT = int(FACTORS[0] % 26)
+
+            PACKET.SOLVED_CHQ = True
 
         PACKET.setData(ENCDATA)
-
+        if ENCDATA[-1] == None:
+            PACKET.DONE = True
         print(
             f"TRANSACTION_ID: {PACKET.TRANSACTION_ID}\nUIN: {PACKET.UIN}\nCHQ: {CHQ}\nENCDATA: {ENCDATA}\nUIN_ANS: {PACKET.UIN_ANS}\nSHIFT: {PACKET.SHIFT}")
 
@@ -222,16 +229,22 @@ class sender:
         print(f"Ack received: {data.decode()}")
 
     def beginTransaction(self):
-        for i in range(5):
-            print("New transaction")
-            self.PACKET = packet()
-            self.sendPacket("INITIATE")
-            self.receiveAccept()
+        print("New transaction")
+        self.PACKET = packet()
+        self.sendPacket("INITIATE")
+        self.receiveAccept()
+        while True:
             self.sendPacket("PULL")
             self.receiveData()
-            self.sendPacket("ACK&SUBMIT")
+            self.sendPacket("ACK")
             self.receiveAck()
-            time.sleep(2)
+
+            if self.PACKET.DONE:
+                self.sendPacket("SUBMIT")
+                self.receiveAck()
+                break
+
+            time.sleep(1)
             print("-----------------\n")
 
 
