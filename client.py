@@ -101,7 +101,7 @@ class sender:
 
         elif self.PULL_SIZE < self.MAX_PULL_SIZE - 1:
             self.PULL_BYTE += self.PULL_SIZE
-            self.PULL_SIZE += 1
+            self.PULL_SIZE = 10
 
         else:
             self.PULL_BYTE += self.PULL_SIZE
