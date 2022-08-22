@@ -94,8 +94,9 @@ class sender:
 
     def handleNextPull(self):
         if self.WINDOW_EXCEEDED:
-            self.MAX_PULL_SIZE = self.PULL_SIZE - 1
-            self.PULL_SIZE //= 2
+            self.PULL_SIZE -= 1
+            self.MAX_PULL_SIZE = self.PULL_SIZE
+
             self.WINDOW_EXCEEDED = False
 
         elif self.PULL_SIZE < self.MAX_PULL_SIZE - 1:
@@ -123,15 +124,17 @@ class sender:
             self.PULL_START_TIME = time.time()
 
         elif type == "ACK":
-            PACKET.setFlag("2")\
+            PACKET.setFlag("2")
 
             self.handleNextPull()
+
+            if(PACKET.DONE):
+                PACKET.appendData("<END>")
+
             print("Sending ACK...")
 
         elif type == "SUBMIT":
             PACKET.setFlag("1")
-            PACKET.appendData("<END>")
-
             print("Submitting data...")
 
         elif type == "ACK&SUBMIT":
@@ -256,7 +259,7 @@ class sender:
         if "<END>" in ENCDATA:
             print(F"ENCRYPTED:\t{ENCDATA}\n********END OF DATA!********")
             PACKET.setDone()
-            ENCDATA, _ = ENCDATA.split("<END>")
+            ENCDATA, _ = ENCDATA.split("<END>")  # Remove <END> from data
 
         PACKET.decodeData(ENCDATA)
 
