@@ -327,3 +327,4 @@ if __name__ == "__main__":
     for i in range(args.debug):
         SENDER = sender(args)
         SENDER.beginTransaction()
+        time.sleep(5)
