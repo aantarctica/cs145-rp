@@ -272,7 +272,7 @@ class sender:
         PACKET = self.PACKET
 
         self.clientSock.setblocking(0)
-        ready = select.select([self.clientSock], [], [], 10)
+        ready = select.select([self.clientSock], [], [], 11)
 
         if ready[0]:
             data, _ = self.clientSock.recvfrom(1024)
@@ -318,8 +318,12 @@ if __name__ == "__main__":
                         help='Port number of client', default=6703)
     parser.add_argument('-i', '--unique_id', type=str,
                         help='Unique ID of client', default="d5f5c97c")
+    parser.add_argument('-d', '--debug', type=int,
+                        help='Number of transactions', default=1)
 
     args = parser.parse_args()
     print(args)
-    SENDER = sender(args)
-    SENDER.beginTransaction()
+
+    for i in range(args.debug):
+        SENDER = sender(args)
+        SENDER.beginTransaction()
