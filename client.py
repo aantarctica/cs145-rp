@@ -320,6 +320,6 @@ if __name__ == "__main__":
                         help='Unique ID of client', default="d5f5c97c")
 
     args = parser.parse_args()
-
+    print(args)
     SENDER = sender(args)
     SENDER.beginTransaction()
