@@ -301,7 +301,7 @@ class sender:
             # self.receiveAck()
             print("-----------------\n")
         self.sendPacket("SUBMIT")
-        self.receiveAck()
+        # self.receiveAck()
         print(f"[TXN{self.PACKET.TRANSACTION_ID}] DONE!\n")
 
 
