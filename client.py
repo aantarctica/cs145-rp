@@ -236,7 +236,7 @@ class sender:
 
         factor = self.PollardRho(large_number, 0)
 
-        return sorted([factor, large_number / factor])
+        return sorted([factor, large_number // factor])
 
     def parseData(self, SERVER_DATA):
         PACKET = self.PACKET
