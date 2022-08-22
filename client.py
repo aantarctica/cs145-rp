@@ -3,14 +3,17 @@ import math
 import random
 import time
 import select
+import argparse
 
 # SSH to your AWS instance
-# ssh -i "keypair.pem" ubuntu@54.255.247.86
+# ssh -i "keypair.pem" ubuntu@
 
+
+# python3 client.py -a 10.0.5.69 -s 9000 -c 1234 -i CS143145
 
 class packet:
-    def __init__(self):
-        self.UNIQUE_ID = "d5f5c97c"
+    def __init__(self, UNIQUE_ID):
+        self.UNIQUE_ID = UNIQUE_ID
         self.TRANSACTION_ID = "YYYYYYYY"
         self.FLAG = "8"
         self.PULL_BYTE = "VVVVV"
@@ -67,12 +70,13 @@ class packet:
 
 
 class sender:
-    def __init__(self):
-        self.UDP_IP_ADDRESS = "10.0.5.69"
-        self.UDP_PORT_NO = 9000
+    def __init__(self, args):
+        self.UDP_IP_ADDRESS = args.address
+        self.UDP_PORT_NO = args.server_port
         self.clientSock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.clientSock.bind(('', 6703))
+        self.clientSock.bind(('', args.client_port))
 
+        self.PACKET_ID = args.unique_id
         self.PULL_SIZE = 1
         self.PULL_BYTE = 0
         self.MAX_PULL_SIZE = 1000
@@ -291,19 +295,31 @@ class sender:
 
     def beginTransaction(self):
         print("New transaction")
-        self.PACKET = packet()
+        self.PACKET = packet(self.PACKET_ID)
         self.sendPacket("INITIATE")
         self.receiveAccept()
         while not self.PACKET.DONE:
             self.sendPacket("PULL")
             self.receiveData()
             self.sendPacket("ACK")
-            # self.receiveAck()
             print("-----------------\n")
         self.sendPacket("SUBMIT")
-        # self.receiveAck()
         print(f"[TXN{self.PACKET.TRANSACTION_ID}] DONE!\n")
 
 
-SENDER = sender()
-SENDER.beginTransaction()
+if __name__ == "__main__":
+
+    parser = argparse.ArgumentParser(description='Process arguments')
+    parser.add_argument('-a', '--address', type=str,
+                        help='IP address of server', default="10.0.5.69")
+    parser.add_argument('-s', '--server_port', type=int,
+                        help='Port number of server', default=9000)
+    parser.add_argument('-c', '--client_port', type=int,
+                        help='Port number of client', default=6703)
+    parser.add_argument('-i', '--unique_id', type=str,
+                        help='Unique ID of client', default="d5f5c97c")
+
+    args = parser.parse_args()
+
+    SENDER = sender(args)
+    SENDER.beginTransaction()
