@@ -280,6 +280,7 @@ class sender:
             if time.time() - self.TRANSACTION_START_TIME < 110:
                 self.handleNextPull()
                 self.sendPacket("PULL")
+                self.receiveData()
             else:
                 PACKET.setDone()
                 return
