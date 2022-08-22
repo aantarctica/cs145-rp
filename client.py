@@ -234,7 +234,7 @@ class sender:
 
         print("Calculating factors...")
 
-        factor = self.PollardRho(large_number, 0)
+        factor = int(self.PollardRho(large_number, 0))
 
         return sorted([factor, large_number // factor])
 
