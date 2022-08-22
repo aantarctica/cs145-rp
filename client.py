@@ -309,6 +309,7 @@ class sender:
                 print("-----------------\n")
             self.sendPacket("SUBMIT")
             print(f"[TXN{self.PACKET.TRANSACTION_ID}] DONE!\n\n\n\n")
+            self.receiveAck()
             time.sleep(5)
 
 
