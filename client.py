@@ -297,8 +297,6 @@ class sender:
         print(f"Ack received:\t{data.decode()}")
 
     def beginTransaction(self):
-
-        # for i in range(self.ITERATIONS):
         print("New transaction")
         self.PACKET = packet(self.PACKET_ID)
         self.sendPacket("INITIATE")
@@ -312,9 +310,6 @@ class sender:
         print(f"[TXN{self.PACKET.TRANSACTION_ID}] DONE!\n\n\n\n")
         time.sleep(1)
         self.receiveAck()
-        # time.sleep(5)
-        self.clientSock.shutdown(socket.SHUT_RDWR)
-        self.clientSock.close
 
 
 if __name__ == "__main__":
@@ -333,7 +328,8 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     print(args)
-
+    SENDER = sender(args)
     for i in range(args.debug):
-        SENDER = sender(args)
+
         SENDER.beginTransaction()
+        time.sleep(5)
