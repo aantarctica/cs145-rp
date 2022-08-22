@@ -127,14 +127,11 @@ class sender:
             PACKET.setFlag("2")
 
             self.handleNextPull()
-
-            if(PACKET.DONE):
-                PACKET.appendData("<END>")
-
             print("Sending ACK...")
 
         elif type == "SUBMIT":
             PACKET.setFlag("1")
+            PACKET.appendData("<END>")
             print("Submitting data...")
 
         elif type == "ACK&SUBMIT":
@@ -252,6 +249,7 @@ class sender:
         FACTORS = self.getUINAns(int(CHQ))
 
         UIN_ANS = int(FACTORS[1])
+        print(FACTORS)
         PACKET.setUINAns(UIN_ANS)
 
         PACKET.setShift(int(FACTORS[0] % 26))
