@@ -268,7 +268,7 @@ class sender:
         PACKET = self.PACKET
 
         self.clientSock.setblocking(0)
-        ready = select.select([self.clientSock], [], [], 10)
+        ready = select.select([self.clientSock], [], [], 15)
 
         if ready[0]:
             data, _ = self.clientSock.recvfrom(1024)
