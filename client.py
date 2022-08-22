@@ -77,6 +77,8 @@ class sender:
         self.clientSock.bind(('', args.client_port))
 
         self.PACKET_ID = args.unique_id
+        self.ITERATIONS = args.debug
+
         self.PULL_SIZE = 1
         self.PULL_BYTE = 0
         self.MAX_PULL_SIZE = 1000
@@ -294,17 +296,19 @@ class sender:
         print(f"Ack received:\t{data.decode()}")
 
     def beginTransaction(self):
-        print("New transaction")
-        self.PACKET = packet(self.PACKET_ID)
-        self.sendPacket("INITIATE")
-        self.receiveAccept()
-        while not self.PACKET.DONE:
-            self.sendPacket("PULL")
-            self.receiveData()
-            self.sendPacket("ACK")
-            print("-----------------\n")
-        self.sendPacket("SUBMIT")
-        print(f"[TXN{self.PACKET.TRANSACTION_ID}] DONE!\n")
+
+        for i in range(self.ITERATIONS):
+            print("New transaction")
+            self.PACKET = packet(self.PACKET_ID)
+            self.sendPacket("INITIATE")
+            self.receiveAccept()
+            while not self.PACKET.DONE:
+                self.sendPacket("PULL")
+                self.receiveData()
+                self.sendPacket("ACK")
+                print("-----------------\n")
+            self.sendPacket("SUBMIT")
+            print(f"[TXN{self.PACKET.TRANSACTION_ID}] DONE!\n\n\n\n")
 
 
 if __name__ == "__main__":
@@ -324,7 +328,5 @@ if __name__ == "__main__":
     args = parser.parse_args()
     print(args)
 
-    for i in range(args.debug):
-        SENDER = sender(args)
-        SENDER.beginTransaction()
-        time.sleep(5)
+    SENDER = sender(args)
+    SENDER.beginTransaction()
