@@ -1,3 +1,4 @@
+from http import client
 import socket
 import math
 import random
@@ -297,21 +298,23 @@ class sender:
 
     def beginTransaction(self):
 
-        for i in range(self.ITERATIONS):
-            print("New transaction")
-            self.PACKET = packet(self.PACKET_ID)
-            self.sendPacket("INITIATE")
-            self.receiveAccept()
-            while not self.PACKET.DONE:
-                self.sendPacket("PULL")
-                self.receiveData()
-                self.sendPacket("ACK")
-                print("-----------------\n")
-            self.sendPacket("SUBMIT")
-            print(f"[TXN{self.PACKET.TRANSACTION_ID}] DONE!\n\n\n\n")
-            time.sleep(1)
-            self.receiveAck()
-            time.sleep(5)
+        # for i in range(self.ITERATIONS):
+        print("New transaction")
+        self.PACKET = packet(self.PACKET_ID)
+        self.sendPacket("INITIATE")
+        self.receiveAccept()
+        while not self.PACKET.DONE:
+            self.sendPacket("PULL")
+            self.receiveData()
+            self.sendPacket("ACK")
+            print("-----------------\n")
+        self.sendPacket("SUBMIT")
+        print(f"[TXN{self.PACKET.TRANSACTION_ID}] DONE!\n\n\n\n")
+        time.sleep(1)
+        self.receiveAck()
+        # time.sleep(5)
+        self.clientSock.shutdown(socket.SHUT_RDWR)
+        self.clientSock.close
 
 
 if __name__ == "__main__":
@@ -331,5 +334,6 @@ if __name__ == "__main__":
     args = parser.parse_args()
     print(args)
 
-    SENDER = sender(args)
-    SENDER.beginTransaction()
+    for i in range(args.debug):
+        SENDER = sender(args)
+        SENDER.beginTransaction()
