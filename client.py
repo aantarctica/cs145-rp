@@ -292,6 +292,8 @@ class sender:
                 PACKET.setDone()
                 return
 
+        self.clientSock.setblocking(1)
+
     def receiveAck(self):
         data, _ = self.clientSock.recvfrom(1024)
         print(f"Ack received:\t{data.decode()}")
