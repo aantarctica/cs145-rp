@@ -131,14 +131,14 @@ class sender:
             PACKET.setFlag("4")
             self.getPullValues()
 
-            print("Sending PULL Packet...")
+            # print("Sending PULL Packet...")
             self.PULL_START_TIME = time.time()
 
         elif type == "ACK":
             PACKET.setFlag("2")
 
             self.handleNextPull()
-            print("Sending ACK...")
+            # print("Sending ACK...")
 
         elif type == "SUBMIT":
             PACKET.setFlag("1")
@@ -148,7 +148,7 @@ class sender:
         elif type == "ACK&SUBMIT":
             PACKET.setFlag("3")
 
-            print("Sending ACK and submitting data...")
+            # print("Sending ACK and submitting data...")
 
         else:
             print("ERROR: Packet type not specified.")
@@ -243,7 +243,7 @@ class sender:
 
     def getUINAns(self, large_number):
 
-        print("Calculating factors...")
+        # print("Calculating factors...")
 
         factor = int(self.PollardRho(large_number, 0))
 
@@ -266,7 +266,7 @@ class sender:
         PACKET.setShift(int(FACTORS[0] % 26))
 
         if "<END>" in ENCDATA:
-            print(F"ENCRYPTED:\t{ENCDATA}\n********END OF DATA!********")
+            # print(F"ENCRYPTED:\t{ENCDATA}\n********END OF DATA!********")
             PACKET.setDone()
             ENCDATA, _ = ENCDATA.split("<END>")  # Remove <END> from data
 
@@ -290,6 +290,7 @@ class sender:
 
             if time.time() - self.TRANSACTION_START_TIME < 110:
                 self.handleNextPull()
+                print("Resending PULL Packet...")
                 self.sendPacket("PULL")
                 self.receiveData()
             else:
@@ -314,7 +315,7 @@ class sender:
             self.sendPacket("PULL")
             self.receiveData()
             self.sendPacket("ACK")
-            print("-----------------\n")
+            # print("-----------------\n")
         self.sendPacket("SUBMIT")
 
     def endTransaction(self):
