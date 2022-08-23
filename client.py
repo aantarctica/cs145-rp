@@ -10,7 +10,7 @@ import argparse
 # ssh -i "keypair.pem" ubuntu@
 # git config --global credential.helper store
 
-# python3 client.py -a 10.0.5.69 -s 9000 -c 6703 -i d5f5c97c
+# python3 client.py -a 10.0.5.69 -s 9000 -c 6703 -i d5f5c97c -d 5
 
 
 class packet:
@@ -320,9 +320,9 @@ class sender:
 
     def endTransaction(self):
 
-        print(f"[TXN{self.PACKET.TRANSACTION_ID}] DONE!")
+        print(f"Transaction {self.PACKET.TRANSACTION_ID} DONE!")
         self.receiveAck()
-        print("\n\n\n\n")
+        print("\n\n")
 
         self.PULL_SIZE = 1
         self.PULL_BYTE = 0
@@ -352,4 +352,4 @@ if __name__ == "__main__":
     for i in range(args.debug):
         SENDER.beginTransaction()
         SENDER.endTransaction()
-        time.sleep(2)
+        time.sleep(1)
