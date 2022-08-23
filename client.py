@@ -8,9 +8,10 @@ import argparse
 
 # SSH to your AWS instance
 # ssh -i "keypair.pem" ubuntu@
+# git config --global credential.helper store
 
+# python3 client.py -a 10.0.5.69 -s 9000 -c 6703 -i d5f5c97c
 
-# python3 client.py -a 10.0.5.69 -s 9000 -c 1234 -i CS143145
 
 class packet:
     def __init__(self, UNIQUE_ID):
@@ -22,6 +23,7 @@ class packet:
         self.UIN = "TTTTTTT"
         self.UIN_ANS = "0"
         self.DATA = ""
+        self.TEMPDATA = ""
         self.SHIFT = 0
         self.DONE = False
 
@@ -46,11 +48,13 @@ class packet:
     def setShift(self, SHIFT):
         self.SHIFT = SHIFT
 
-    def appendData(self, DATA):
-        self.DATA += DATA
+    def appendData(self, TEMPDATA):
+        self.TEMPDATA += TEMPDATA
 
-    def decodeData(self, TEMP_DATA):
-        ENCRYPTED = TEMP_DATA
+    def setData(self, DATA):
+        self.DATA = DATA
+
+    def decodeData(self, ENCRYPTED):
         DECRYPTED = ""
         base_capital = ord('A')
         base_small = ord('a')
@@ -63,8 +67,8 @@ class packet:
                 DECRYPTED += chr((ord(char) - base_small -
                                  self.SHIFT) % 26 + base_small)
 
-        print(f"\t\tENCRYPTED: {ENCRYPTED}\n\t\tDECRYPTED: {DECRYPTED}")
-        self.DATA += DECRYPTED
+        # print(f"\t\tENCRYPTED: {ENCRYPTED}\n\t\tDECRYPTED: {DECRYPTED}")
+        self.TEMPDATA += DECRYPTED
 
     def setDone(self):
         self.DONE = True
@@ -138,7 +142,7 @@ class sender:
 
         elif type == "SUBMIT":
             PACKET.setFlag("1")
-            # PACKET.appendData("<END>")
+            PACKET.setData(PACKET.TEMPDATA)
             print("Submitting data...")
 
         elif type == "ACK&SUBMIT":
@@ -152,7 +156,7 @@ class sender:
         # SEND PAYLOAD
         self.PAYLOAD = f"{PACKET.UNIQUE_ID}{PACKET.TRANSACTION_ID}{PACKET.FLAG}{PACKET.PULL_BYTE}{PACKET.PULL_SIZE}{PACKET.UIN}{PACKET.UIN_ANS}/{PACKET.DATA}"
 
-        print(f"{type}:\t{self.PAYLOAD}")
+        # print(f"{type}:\t{self.PAYLOAD}")
 
         self.clientSock.sendto(self.PAYLOAD.encode(),
                                (self.UDP_IP_ADDRESS, self.UDP_PORT_NO))
@@ -166,7 +170,7 @@ class sender:
             print("ERROR: Existing alive transaction")
             exit(-1)
 
-        print(SERVER_RESPONSE)
+        # print(SERVER_RESPONSE)
 
         TRANSACTION_ID = SERVER_RESPONSE
         PACKET.setTransID(TRANSACTION_ID)
@@ -256,7 +260,7 @@ class sender:
         FACTORS = self.getUINAns(int(CHQ))
 
         UIN_ANS = int(FACTORS[1])
-        print(FACTORS)
+        # print(FACTORS)
         PACKET.setUINAns(UIN_ANS)
 
         PACKET.setShift(int(FACTORS[0] % 26))
@@ -268,8 +272,8 @@ class sender:
 
         PACKET.decodeData(ENCDATA)
 
-        print(
-            f"TRANSACTION_ID:\t{PACKET.TRANSACTION_ID}\nUIN:\t{PACKET.UIN}\nCHQ:\t{CHQ}\nENCDATA:\t{ENCDATA}\nUIN_ANS:\t{PACKET.UIN_ANS}\nSHIFT:\t{PACKET.SHIFT}")
+        # print(
+        #     f"TRANSACTION_ID:\t{PACKET.TRANSACTION_ID}\nUIN:\t{PACKET.UIN}\nCHQ:\t{CHQ}\nENCDATA:\t{ENCDATA}\nUIN_ANS:\t{PACKET.UIN_ANS}\nSHIFT:\t{PACKET.SHIFT}")
 
     def receiveData(self):
         PACKET = self.PACKET
@@ -301,6 +305,9 @@ class sender:
     def beginTransaction(self):
         print("New transaction")
         self.PACKET = packet(self.PACKET_ID)
+
+        self.TRANSACTION_START_TIME = time.time()
+
         self.sendPacket("INITIATE")
         self.receiveAccept()
         while not self.PACKET.DONE:
@@ -309,9 +316,18 @@ class sender:
             self.sendPacket("ACK")
             print("-----------------\n")
         self.sendPacket("SUBMIT")
-        print(f"[TXN{self.PACKET.TRANSACTION_ID}] DONE!\n\n\n\n")
-        time.sleep(1)
+
+    def endTransaction(self):
+
+        print(f"[TXN{self.PACKET.TRANSACTION_ID}] DONE!")
         self.receiveAck()
+        print("\n\n\n\n")
+
+        self.PULL_SIZE = 1
+        self.PULL_BYTE = 0
+        self.MAX_PULL_SIZE = 1000
+        self.WINDOW_EXCEEDED = False
+        self.PULL_START_TIME = 0
 
 
 if __name__ == "__main__":
@@ -329,9 +345,10 @@ if __name__ == "__main__":
                         help='Number of transactions', default=1)
 
     args = parser.parse_args()
-    print(args)
+    # print(args)
     SENDER = sender(args)
-    for i in range(args.debug):
 
+    for i in range(args.debug):
         SENDER.beginTransaction()
-        time.sleep(5)
+        SENDER.endTransaction()
+        time.sleep(2)
