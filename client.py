@@ -425,9 +425,7 @@ class sender:
         self.PULL_START_TIME = 0
 
 
-if __name__ == "__main__":
-
-    # Handles arguments in user input
+def parseArgs():
     parser = argparse.ArgumentParser(description='Process arguments')
     parser.add_argument('-a', '--address', type=str,
                         help='IP address of server', default="10.0.5.69")
@@ -441,6 +439,14 @@ if __name__ == "__main__":
                         help='Number of transactions', default=1)
 
     args = parser.parse_args()
+
+    return args
+
+
+if __name__ == "__main__":
+
+    # Handles arguments in user input
+    args = parseArgs()
     SENDER = sender(args)
 
     for i in range(args.debug):
