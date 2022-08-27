@@ -176,18 +176,6 @@ class sender:
     def sendPacket(self, type):
         PACKET = self.PACKET
 
-        if time.time() - self.TRANSACTION_START_TIME > 110:
-            # Submits packet before transaction time
-            # reaches 120 seconds.
-
-            # *Note: This is only a debugging feature to see
-            # if the client is able to send at least 50% of the
-            # payload correctly. This is irrelevant to the specs
-            # of the final project.
-
-            PACKET.setDone()
-            return
-
         if type == "INITIATE":
             # Packet is already initialized as an INITIATE
             # packet. Modifications unnecessary.
@@ -374,7 +362,7 @@ class sender:
         # Timeout is 10 seconds + 1
 
         self.clientSock.setblocking(0)
-        ready = select.select([self.clientSock], [], [], 11)
+        ready = select.select([self.clientSock], [], [], 10)
 
         if ready[0]:
             data, _ = self.clientSock.recvfrom(1024)
@@ -385,23 +373,14 @@ class sender:
             print("ERROR: Pull Window Exceeded!")
             self.WINDOW_EXCEEDED = True
 
-            if time.time() - self.TRANSACTION_START_TIME < 110:
-                # Modifies pull size to handle exceeded error
-                self.handleNextPull()
-                print("Resending PULL Packet...")
+            # Modifies pull size to handle exceeded error
+            self.handleNextPull()
+            print("Resending PULL Packet...")
 
-                # Resends the same pull packet with a reduced
-                # pull size.
-                self.sendPacket("PULL")
-                self.receiveData()
-            else:
-                # *Note: Use of TIME as condition is only a debugging
-                # feature to see if the client is able to send
-                # at least 50% of the payload correctly. This is
-                # irrelevant to the specs of the final project.
-
-                PACKET.setDone()
-                return
+            # Resends the same pull packet with a reduced
+            # pull size.
+            self.sendPacket("PULL")
+            self.receiveData()
 
         # Enables socket blocking again
         self.clientSock.setblocking(1)
