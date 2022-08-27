@@ -362,7 +362,7 @@ class sender:
         # Timeout is 10 seconds + 1
 
         self.clientSock.setblocking(0)
-        ready = select.select([self.clientSock], [], [], 10)
+        ready = select.select([self.clientSock], [], [], 11)
 
         if ready[0]:
             data, _ = self.clientSock.recvfrom(1024)
