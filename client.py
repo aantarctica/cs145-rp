@@ -204,9 +204,6 @@ class sender:
             PACKET.setData(PACKET.TEMPDATA)
             print("Submitting data...")
 
-        elif type == "ACK&SUBMIT":
-            PACKET.setFlag("3")
-
         else:
             print("ERROR: Packet type not specified.")
 
