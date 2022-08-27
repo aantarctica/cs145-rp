@@ -425,6 +425,7 @@ class sender:
         self.PULL_START_TIME = 0
 
 
+# Handles arguments in user input
 def parseArgs():
     parser = argparse.ArgumentParser(description='Process arguments')
     parser.add_argument('-a', '--address', type=str,
@@ -444,8 +445,6 @@ def parseArgs():
 
 
 if __name__ == "__main__":
-
-    # Handles arguments in user input
     args = parseArgs()
     SENDER = sender(args)
 
