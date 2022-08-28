@@ -18,8 +18,8 @@ Trace files were generated with **tshark** and trace analysis was done using **W
 
 This program runs on a system with Python of version **at least 3.8.10**. The machine should also be at the s**ame network (AWS Virtual Private Cloud)** as the TGRS.
 
-python3 client.py -a <address> -s <server port> -c <client port> -i <unique id>
+`python3 client.py -a <address> -s <server_port> -c <client_port> -i <unique_id>`
 
 (optional: run multiple sequential transactions)
 
-python3 client.py -a <address> -s <server_port> -c <client_port> -i <unique_id> -d <number_of_transactions>
+`python3 client.py -a <address> -s <server_port> -c <client_port> -i <unique_id> -d <number_of_transactions>`
